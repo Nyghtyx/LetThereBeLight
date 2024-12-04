@@ -2,6 +2,7 @@
 
 #include "Vec2.hpp"
 #include <SFML/Graphics.hpp>
+#include <vector>
 
 class Component
 {
@@ -27,12 +28,18 @@ public:
 
 class CPolygon : public Component
 {
-    // TODO: This component should hold the polygon info
-    // Check if SFML has some polygon class already
-    // If not can specify polygon with the 4 vertices
 public:
 
+    sf::ConvexShape polygon;
+
     CPolygon() = default;
+    CPolygon(size_t points)
+        : polygon(points)
+    {
+        polygon.setFillColor(sf::Color::Black);
+        polygon.setOutlineColor(sf::Color::White);
+        polygon.setOutlineThickness(1);
+    }
 };
 
 class CCircleShape : public Component

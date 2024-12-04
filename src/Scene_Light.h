@@ -10,6 +10,7 @@ class Scene_Light : public Scene
 	void update();
 	void onEnd();
 	void spawnLightSource();
+	void spawnPolygons();
 	
 	void sDoAction(const Action& action);
 	void sCollision();
