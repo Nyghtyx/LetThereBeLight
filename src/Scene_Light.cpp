@@ -43,18 +43,52 @@ void Scene_Light::spawnLightSource()
 {
 	auto light = m_entityManager.addEntity("light");
 	light->add<CTransform>(Vec2f(width() / 2.0f, height() / 2.0f));
-	light->add<CCircleShape>(32, 32, sf::Color(247, 247, 111), sf::Color(211, 218, 19), 8);
+	light->add<CCircleShape>(24, 32, sf::Color(247, 247, 111));
 	light->add<CInput>();
 }
 
 void Scene_Light::sDoAction(const Action& action)
 {
-	//TODO handle user input
+	auto& input = light()->get<CInput>();
+
+	if (action.type() == "START")
+	{
+		if (action.name() == "UP") { input.up = true; }
+		else if (action.name() == "DOWN") { input.down = true; }
+		else if (action.name() == "LEFT") { input.left = true; }
+		else if (action.name() == "RIGHT") { input.right = true; }
+		else if (action.name() == "QUIT") { onEnd(); }
+	}
+	else if (action.type() == "END")
+	{
+		if (action.name() == "UP") { input.up = false; }
+		else if (action.name() == "DOWN") { input.down = false; }
+		else if (action.name() == "LEFT") { input.left = false; }
+		else if (action.name() == "RIGHT") { input.right = false; }
+	}
 }
 
 void Scene_Light::sMovement()
 {
-	//TODO implement movement so we can move lightsource around
+	auto& transform = light()->get<CTransform>();
+	auto& input = light()->get<CInput>();
+	Vec2f velocity = Vec2f(0.0f, 0.0f);
+	if (input.up) { velocity.y += -1.0f; }
+	if (input.down) { velocity.y += 1.0f; }
+	if (input.left) { velocity.x += -1.0f; }
+	if (input.right) { velocity.x += 1.0f; }
+
+	if (velocity == Vec2f(0.0f, 0.0f))
+	{
+		transform.velocity = velocity;
+	}
+	else
+	{
+		transform.velocity = velocity / velocity.length() * 5;
+	}
+
+	transform.pos += transform.velocity;
+	light()->get<CCircleShape>().circle.setPosition(transform.pos);
 }
 
 void Scene_Light::sLighting()
@@ -66,8 +100,15 @@ void Scene_Light::sRender()
 {
 	m_game.window().clear();
 
-	// TODO: implement all the drawing of polygons and lighting here
+	// draw light
+	m_game.window().draw(light()->get<CCircleShape>().circle);
 
 	m_game.window().display();
 
+}
+
+std::shared_ptr<Entity> Scene_Light::light()
+{
+	auto& lights = m_entityManager.getEntities("light");
+	return lights.front();
 }

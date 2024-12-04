@@ -2,6 +2,7 @@
 
 #include "Scene.h"
 #include "EntityManager.hpp"
+#include <memory>
 
 class Scene_Light : public Scene
 {
@@ -15,6 +16,7 @@ class Scene_Light : public Scene
 	void sLighting();
 	void sRender();
 
+	std::shared_ptr<Entity> light();
 
 public:
 

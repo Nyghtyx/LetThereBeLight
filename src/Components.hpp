@@ -41,12 +41,10 @@ public:
     sf::CircleShape circle;
 
     CCircleShape() = default;
-    CCircleShape(float radius, size_t points, const sf::Color& fill, const sf::Color& outline, float thickness)
+    CCircleShape(float radius, size_t points, const sf::Color& fill)
         : circle(radius, points)
     {
         circle.setFillColor(fill);
-        circle.setOutlineColor(outline);
-        circle.setOutlineThickness(thickness);
         circle.setOrigin(radius, radius);
     }
 };
