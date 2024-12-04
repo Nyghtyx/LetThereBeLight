@@ -19,6 +19,8 @@ void Scene_Light::init()
 	registerAction(sf::Keyboard::A, "LEFT");
 	registerAction(sf::Keyboard::S, "DOWN");
 	registerAction(sf::Keyboard::D, "RIGHT");
+
+	spawnLightSource();
 }
 
 void Scene_Light::update()
@@ -39,7 +41,10 @@ void Scene_Light::onEnd()
 
 void Scene_Light::spawnLightSource()
 {
-
+	auto light = m_entityManager.addEntity("light");
+	light->add<CTransform>(Vec2f(width() / 2.0f, height() / 2.0f));
+	light->add<CCircleShape>(32, 32, sf::Color(247, 247, 111), sf::Color(211, 218, 19), 8);
+	light->add<CInput>();
 }
 
 void Scene_Light::sDoAction(const Action& action)
