@@ -18,6 +18,22 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\GameEngine.cpp" />
+    <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\Scene.cpp" />
+    <ClCompile Include="src\Scene_Light.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\Action.hpp" />
+    <ClInclude Include="src\Components.hpp" />
+    <ClInclude Include="src\Entity.hpp" />
+    <ClInclude Include="src\EntityManager.hpp" />
+    <ClInclude Include="src\GameEngine.h" />
+    <ClInclude Include="src\Scene.h" />
+    <ClInclude Include="src\Scene_Light.h" />
+    <ClInclude Include="src\Vec2.hpp" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
@@ -152,9 +168,6 @@
       <AdditionalDependencies>$(CoreLibraryDependencies);%(AdditionalDependencies);sfml-graphics.lib;sfml-window.lib;sfml-system.lib;opengl32.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
-  <ItemGroup>
-    <ClCompile Include="main.cpp" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
