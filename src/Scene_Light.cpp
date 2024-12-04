@@ -28,6 +28,7 @@ void Scene_Light::update()
 	m_entityManager.update();
 
 	sMovement();
+	sCollision();
 	sLighting();
 	sRender();
 
@@ -89,6 +90,23 @@ void Scene_Light::sMovement()
 
 	transform.pos += transform.velocity;
 	light()->get<CCircleShape>().circle.setPosition(transform.pos);
+}
+
+void Scene_Light::sCollision()
+{
+	auto& transform = light()->get<CTransform>();
+	float radius = light()->get<CCircleShape>().circle.getRadius();
+
+	// simple collision checking to dont go out of bounds
+	if ((transform.pos.x + radius > width()) || (transform.pos.x - radius) < 0)
+	{
+		transform.pos.x -= transform.velocity.x;
+	}
+
+	if ((transform.pos.y + radius > height()) || (transform.pos.y - radius) < 0)
+	{
+		transform.pos.y -= transform.velocity.y;
+	}
 }
 
 void Scene_Light::sLighting()

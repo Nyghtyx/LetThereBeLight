@@ -12,6 +12,7 @@ class Scene_Light : public Scene
 	void spawnLightSource();
 	
 	void sDoAction(const Action& action);
+	void sCollision();
 	void sMovement();
 	void sLighting();
 	void sRender();
