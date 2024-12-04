@@ -9,7 +9,8 @@ class EntityManager;
 using ComponentTuple = std::tuple <
     CTransform,
     CInput,
-    CPolygon
+    CPolygon,
+    CCircleShape
 >;
 
 class Entity
