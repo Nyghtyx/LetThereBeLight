@@ -2,6 +2,6 @@
 
 int main()
 {
-	GameEngine g();
+	GameEngine g;
 	g.run();
 }

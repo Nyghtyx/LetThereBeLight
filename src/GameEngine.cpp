@@ -1,4 +1,5 @@
 #include "Scene.h"
+#include "Scene_Light.h"
 #include "GameEngine.h"
 
 #include <iostream>
@@ -13,8 +14,7 @@ void GameEngine::init()
     m_window.create(sf::VideoMode(1280, 768), "Let There Be Light");
     m_window.setFramerateLimit(60);
 
-    // TODO: Create first a simple scene to change to
-    //changeScene("LIGHT", std::make_shared<Scene_Menu>(*this));
+    changeScene("LIGHT", std::make_shared<Scene_Light>(*this));
 }
 
 std::shared_ptr<Scene> GameEngine::currentScene()
