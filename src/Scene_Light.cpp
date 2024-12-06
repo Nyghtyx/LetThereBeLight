@@ -143,36 +143,48 @@ void Scene_Light::sLighting()
 {
 	for (auto& polygon : m_entityManager.getEntities("polygon"))
 	{
-		racycastToPolygons(light(), polygon);
+		std::vector<Intersect> intersects = racycastToPolygons(light(), polygon);
+		
+		// TODO: Need to store intersects and then sort them by their angle with respect to the light source
+		// then simply construct a convex shape with the ordered positions of the interesects.
 	}
 }
 
-void Scene_Light::racycastToPolygons(std::shared_ptr<Entity> lightSource, std::shared_ptr<Entity> polygon)
+std::vector<Scene_Light::Intersect> Scene_Light::racycastToPolygons(std::shared_ptr<Entity> lightSource, std::shared_ptr<Entity> polygon)
 {
-	 Vec2f& a = lightSource->get<CTransform>().pos;
 
-	 size_t vertices = polygon->get<CPolygon>().polygon.getPointCount();
+	
+	Vec2f& a = lightSource->get<CTransform>().pos;
 
-	 // raycast to polygon vertices. For each vertex 3 rays should be cast.
-	 // one to the vertex, one slightly to the left and one slightly to the right
-	 // should check the closest interesect with a polygon segment
-	 for (int i = 0; i < vertices; i++)
-	 {
-		 const Vec2f& vertex = polygon->get<CPolygon>().polygon.getPoint(i);
-		 Intersect vertexIntersect = intersectPolygons(a, vertex);
-		 Intersect leftIntersect = intersectPolygons(a, rotateLineSegment(a, vertex, 0.0001f));
-		 Intersect rightIntersect = intersectPolygons(a, rotateLineSegment(a, vertex, -0.0001f));
+	size_t vertices = polygon->get<CPolygon>().polygon.getPointCount();
+	std::vector<Intersect> intersects;
 
-		 if (m_drawRays)
-		 {
-			 drawLine(a, vertexIntersect.pos, sf::Color::Red);
-			 drawPoint(vertexIntersect.pos, sf::Color::Red);
-			 drawLine(a, leftIntersect.pos, sf::Color::Red);
-			 drawPoint(leftIntersect.pos, sf::Color::Red);
-			 drawLine(a, rightIntersect.pos, sf::Color::Red);
-			 drawPoint(rightIntersect.pos, sf::Color::Red);
-		 }
-	 }
+	// raycast to polygon vertices. For each vertex 3 rays should be cast.
+	// one to the vertex, one slightly to the left and one slightly to the right
+	// should check the closest interesect with a polygon segment
+	for (int i = 0; i < vertices; i++)
+	{
+		const Vec2f& vertex = polygon->get<CPolygon>().polygon.getPoint(i);
+		Intersect vertexIntersect = intersectPolygons(a, vertex);
+		Intersect leftIntersect = intersectPolygons(a, rotateLineSegment(a, vertex, 0.0001f));
+		Intersect rightIntersect = intersectPolygons(a, rotateLineSegment(a, vertex, -0.0001f));
+
+		intersects.push_back(leftIntersect);
+		intersects.push_back(vertexIntersect);
+		intersects.push_back(rightIntersect);
+
+		// TODO: get this drawing logic out of here
+		if (m_drawRays)
+		{
+			drawLine(a, vertexIntersect.pos, sf::Color::Red);
+			drawPoint(vertexIntersect.pos, sf::Color::Red);
+			drawLine(a, leftIntersect.pos, sf::Color::Red);
+			drawPoint(leftIntersect.pos, sf::Color::Red);
+			drawLine(a, rightIntersect.pos, sf::Color::Red);
+			drawPoint(rightIntersect.pos, sf::Color::Red);
+		}
+	}
+	return intersects;
 }
 
 Scene_Light::Intersect Scene_Light::intersectPolygons(const Vec2f& a, const Vec2f& b)

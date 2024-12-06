@@ -3,6 +3,7 @@
 #include "Scene.h"
 #include "EntityManager.hpp"
 #include <memory>
+#include <vector>
 
 class Scene_Light : public Scene
 {
@@ -22,7 +23,7 @@ class Scene_Light : public Scene
 
 	void drawLinesToVertices(std::shared_ptr<Entity> polygon);
 	void drawPoint(const Vec2f& p, const sf::Color& color = { 255, 255, 255 });
-	void racycastToPolygons(std::shared_ptr<Entity> lightSource, std::shared_ptr<Entity> polygon);
+	
 	
 	void sDoAction(const Action& action);
 	void sCollision();
@@ -32,7 +33,8 @@ class Scene_Light : public Scene
 
 	std::shared_ptr<Entity> light();
 	Intersect lineIntersect(const Vec2f& a, const Vec2f& b, const Vec2f& c, const Vec2f& d); 
-	Intersect intersectPolygons(const Vec2f& a, const Vec2f& b);
+	Intersect intersectPolygons(const Vec2f& a, const Vec2f& b); 
+	std::vector<Intersect> racycastToPolygons(std::shared_ptr<Entity> lightSource, std::shared_ptr<Entity> polygon);
 	Vec2f rotateLineSegment(const Vec2f& a, const Vec2f& b, float angle);
 
 public:
