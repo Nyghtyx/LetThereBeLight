@@ -11,17 +11,16 @@ class Scene_Light : public Scene
 	{
 		bool result;
 		Vec2f pos;
+		float angle;
 	};
 
-	bool m_drawRays = true;
+	bool m_drawRays = false;
 
 	void init();
 	void update();
 	void onEnd();
 	void spawnLightSource();
 	void spawnPolygons();
-
-	void drawLinesToVertices(std::shared_ptr<Entity> polygon);
 	void drawPoint(const Vec2f& p, const sf::Color& color = { 255, 255, 255 });
 	
 	

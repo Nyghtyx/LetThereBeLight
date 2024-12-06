@@ -7,6 +7,7 @@
 #include <cmath>
 #include <vector>
 #include <map>
+#include <algorithm>
 
 Scene_Light::Scene_Light(GameEngine& gameEngine)
 	: Scene(gameEngine)
@@ -141,19 +142,52 @@ void Scene_Light::sCollision()
 
 void Scene_Light::sLighting()
 {
+	std::vector<Intersect> allIntersects;
+
 	for (auto& polygon : m_entityManager.getEntities("polygon"))
 	{
 		std::vector<Intersect> intersects = racycastToPolygons(light(), polygon);
-		
-		// TODO: Need to store intersects and then sort them by their angle with respect to the light source
-		// then simply construct a convex shape with the ordered positions of the interesects.
+		allIntersects.insert(allIntersects.end(), intersects.begin(), intersects.end());
+	}
+
+	// sort the intersections by the angle that the segment between the light source and
+	// the intersection point makes with respect the x-axis
+	// we need to sort them because we have to create a sf::TrianglesFan and input the points
+	// in order
+	std::sort(allIntersects.begin(), allIntersects.end(), [](const Intersect& a, const Intersect& b)
+		{ return a.angle < b.angle; });
+	
+	std::vector<sf::Vertex> vertices;
+	sf::Color visibilityColor = sf::Color(247, 247, 111, 60);
+	// to create a triangle fan in sfml
+	// first push the center point
+	vertices.push_back(sf::Vertex(light()->get<CTransform>().pos));
+	vertices[0].color =  visibilityColor;
+	
+	// then push all the points
+	for (int i = 0; i < allIntersects.size(); i++)
+	{
+		vertices.push_back(sf::Vertex(allIntersects[i].pos));
+		vertices[i + 1].color = visibilityColor;
+	}
+	// then push the first point again to close the triangle fan
+	vertices.push_back(sf::Vertex(allIntersects.front().pos));
+	vertices.back().color = visibilityColor;
+
+	m_game.window().draw(&vertices[0], vertices.size(), sf::TrianglesFan);
+
+	if (m_drawRays)
+	{
+		for (size_t i = 0; i < allIntersects.size(); i++)
+		{
+			drawLine(light()->get<CTransform>().pos, allIntersects[i].pos, sf::Color::Red);
+			drawPoint(allIntersects[i].pos, sf::Color::Red);
+		}
 	}
 }
 
 std::vector<Scene_Light::Intersect> Scene_Light::racycastToPolygons(std::shared_ptr<Entity> lightSource, std::shared_ptr<Entity> polygon)
 {
-
-	
 	Vec2f& a = lightSource->get<CTransform>().pos;
 
 	size_t vertices = polygon->get<CPolygon>().polygon.getPointCount();
@@ -161,7 +195,8 @@ std::vector<Scene_Light::Intersect> Scene_Light::racycastToPolygons(std::shared_
 
 	// raycast to polygon vertices. For each vertex 3 rays should be cast.
 	// one to the vertex, one slightly to the left and one slightly to the right
-	// should check the closest interesect with a polygon segment
+	// these left and right extra right make sure lighting reaches the bounds of the window
+	// should check the closest interesect with a polygon segment and return it
 	for (int i = 0; i < vertices; i++)
 	{
 		const Vec2f& vertex = polygon->get<CPolygon>().polygon.getPoint(i);
@@ -172,17 +207,6 @@ std::vector<Scene_Light::Intersect> Scene_Light::racycastToPolygons(std::shared_
 		intersects.push_back(leftIntersect);
 		intersects.push_back(vertexIntersect);
 		intersects.push_back(rightIntersect);
-
-		// TODO: get this drawing logic out of here
-		if (m_drawRays)
-		{
-			drawLine(a, vertexIntersect.pos, sf::Color::Red);
-			drawPoint(vertexIntersect.pos, sf::Color::Red);
-			drawLine(a, leftIntersect.pos, sf::Color::Red);
-			drawPoint(leftIntersect.pos, sf::Color::Red);
-			drawLine(a, rightIntersect.pos, sf::Color::Red);
-			drawPoint(rightIntersect.pos, sf::Color::Red);
-		}
 	}
 	return intersects;
 }
@@ -190,7 +214,7 @@ std::vector<Scene_Light::Intersect> Scene_Light::racycastToPolygons(std::shared_
 Scene_Light::Intersect Scene_Light::intersectPolygons(const Vec2f& a, const Vec2f& b)
 {
 	// fake intersect initialized with a very far point so that it gets replaced
-	Intersect closestIntersect{ true, Vec2f(width() * 2 + 1, height() * 2 + 1) };
+	Intersect closestIntersect{ true, Vec2f(width() * 2 + 1, height() * 2 + 1), 0.0f };
 
 	for (auto& otherPolygon : m_entityManager.getEntities("polygon"))
 	{
@@ -223,18 +247,6 @@ Vec2f Scene_Light::rotateLineSegment(const Vec2f& a, const Vec2f& b, float angle
 	float scale = Vec2f(0.0f, 0.0f).dist2(Vec2f(width(), height())) / a.dist2(b);
 	// scale it so that is out of bounds
 	return a + rotatedVector * scale;
-}
-
-void Scene_Light::drawLinesToVertices(std::shared_ptr<Entity> polygon)
-{
-	size_t vertices = polygon->get<CPolygon>().polygon.getPointCount();
-
-	for (int i = 0; i < vertices; i++)
-	{
-		const Vec2f& vertex = polygon->get<CPolygon>().polygon.getPoint(i);
-		drawPoint(vertex, sf::Color::Red);
-		drawLine(light()->get<CTransform>().pos, vertex, sf::Color::Red);
-	}
 }
 
 void Scene_Light::drawPoint(const Vec2f& p, const sf::Color& color)
@@ -279,12 +291,14 @@ Scene_Light::Intersect Scene_Light::lineIntersect(const Vec2f& a, const Vec2f& b
 	Vec2f cma = c - a;
 	float t = cma.crossProduct(s) / rxs;
 	float u = cma.crossProduct(r) / rxs;
+	Vec2f point = Vec2f(a.x + t * r.x, a.y + t * r.y);
+	float angle = atan2(point.y - a.y, point.x - a.x);
 	if (t >= 0 && t <= 1 && u >= 0 && u <= 1)
 	{
-		return { true, Vec2f(a.x + t * r.x, a.y + t * r.y) };
+		return { true, point,  angle };
 	}
 	else
 	{
-		return { false, Vec2f(0.0f, 0.0f) };
+		return { false, Vec2f(0.0f, 0.0f), 0 };
 	}
 }
