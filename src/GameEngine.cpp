@@ -11,7 +11,7 @@ GameEngine::GameEngine()
 
 void GameEngine::init()
 {
-    m_window.create(sf::VideoMode(1280, 768), "Let There Be Light");
+    m_window.create(sf::VideoMode(1280, 720), "Let There Be Light");
     m_window.setFramerateLimit(60);
 
     changeScene("LIGHT", std::make_shared<Scene_Light>(*this));

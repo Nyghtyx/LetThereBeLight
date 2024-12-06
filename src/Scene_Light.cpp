@@ -63,6 +63,13 @@ void Scene_Light::spawnPolygons()
 	polyMap[4] = std::vector<Vec2f>{ Vec2f(540.0f, 60.0f), Vec2f(560.0f, 40.0f), Vec2f(570.0f, 70.0f) };
 	polyMap[5] = std::vector<Vec2f>{ Vec2f(650.0f, 190.0f), Vec2f(760.0f, 170.0f), Vec2f(740.0f, 270.0f), Vec2f(630.0f, 290.0f) };
 	polyMap[6] = std::vector<Vec2f>{ Vec2f(600.0f, 95.0f), Vec2f(780.0f, 50.0f), Vec2f(680.0f, 150.0f)};
+	polyMap[7] = std::vector<Vec2f>{ Vec2f(100.0f, 600.0f), Vec2f(150.0f, 520.0f), Vec2f(200.0f, 620.0f), Vec2f(130.0f, 700.0f) };
+	polyMap[8] = std::vector<Vec2f>{ Vec2f(300.0f, 500.0f), Vec2f(400.0f, 450.0f), Vec2f(350.0f, 550.0f) };
+	polyMap[9] = std::vector<Vec2f>{ Vec2f(600.0f, 500.0f), Vec2f(700.0f, 470.0f), Vec2f(750.0f, 580.0f), Vec2f(650.0f, 620.0f) };
+	polyMap[10] = std::vector<Vec2f>{ Vec2f(900.0f, 300.0f), Vec2f(950.0f, 250.0f), Vec2f(1000.0f, 350.0f), Vec2f(920.0f, 400.0f) };
+	polyMap[11] = std::vector<Vec2f>{ Vec2f(1050.0f, 600.0f), Vec2f(1150.0f, 480.0f), Vec2f(1180.0f, 670.0f), Vec2f(1000.0f, 700.0f) };
+	polyMap[12] = std::vector<Vec2f>{ Vec2f(400.0f, 300.0f), Vec2f(450.0f, 280.0f), Vec2f(500.0f, 320.0f), Vec2f(430.0f, 350.0f) };
+	polyMap[13] = std::vector<Vec2f>{ Vec2f(1050.0f, 40.0f), Vec2f(1200.0f, 180.0f), Vec2f(950.0f, 200.0f), Vec2f(850.0f, 160.0f) };
 
 	for (auto& [i, points] : polyMap)
 	{
