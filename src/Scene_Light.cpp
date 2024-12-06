@@ -32,7 +32,6 @@ void Scene_Light::update()
 
 	sMovement();
 	sCollision();
-	sLighting();
 	sRender();
 
 	m_currentFrame++;
@@ -47,7 +46,7 @@ void Scene_Light::spawnLightSource()
 {
 	auto light = m_entityManager.addEntity("light");
 	light->add<CTransform>(Vec2f(width() / 2.0f, height() / 2.0f));
-	light->add<CCircleShape>(24, 32, sf::Color(247, 247, 111));
+	light->add<CCircleShape>(16, 24, sf::Color(247, 247, 111));
 	light->add<CInput>();
 }
 
@@ -141,7 +140,49 @@ void Scene_Light::sCollision()
 
 void Scene_Light::sLighting()
 {
+	for (auto& polygon : m_entityManager.getEntities("polygon"))
+	{
+		drawLineToIntersections(light(), polygon);
+	}
+}
 
+void Scene_Light::drawLineToIntersections(std::shared_ptr<Entity> lightSource, std::shared_ptr<Entity> polygon)
+{
+	 Vec2f& a = lightSource->get<CTransform>().pos;
+
+	 size_t vertices = polygon->get<CPolygon>().polygon.getPointCount();
+
+	 for (int i = 0; i < vertices; i++)
+	 {
+		 const Vec2f& b = polygon->get<CPolygon>().polygon.getPoint(i);
+		 // fake intersect initialized with a very far point so that it gets replaced
+		 Intersect closestIntersect{ true, Vec2f(5000.0f, 5000.0f)};
+
+		 for (auto& otherPolygon : m_entityManager.getEntities("polygon"))
+		 {
+			 size_t v = otherPolygon->get<CPolygon>().polygon.getPointCount();
+			 for (int j = 0; j < v; j++)
+			 {
+				 const Vec2f& c = otherPolygon->get<CPolygon>().polygon.getPoint(j);
+				 // (j+1)%v so that when we get to the last point we loop to the first to close the polygon
+				 const Vec2f& d = otherPolygon->get<CPolygon>().polygon.getPoint((j + 1) % v);
+
+				 // now we have the 2 segments to check intersection (a-b) and (c-d)
+				 Intersect intersect = lineIntersect(a, b, c, d);
+				 // if it intersects and the intersection point is the closest then replace closest intersect
+				 if (intersect.result && (a.dist(intersect.pos) < a.dist(closestIntersect.pos)))
+				 {
+					 closestIntersect = intersect;
+				 }
+			 }
+		 }
+
+		 if (m_drawRays)
+		 {
+			 drawLine(a, closestIntersect.pos, sf::Color::Red);
+			 drawPoint(closestIntersect.pos, sf::Color::Red);
+		 }
+	 }
 }
 
 void Scene_Light::drawLinesToVertices(std::shared_ptr<Entity> polygon)
@@ -174,8 +215,9 @@ void Scene_Light::sRender()
 	for (auto& polygon : m_entityManager.getEntities("polygon"))
 	{
 		m_game.window().draw(polygon->get<CPolygon>().polygon);
-		drawLinesToVertices(polygon);
 	}
+
+	sLighting();
 
 	// draw light source
 	m_game.window().draw(light()->get<CCircleShape>().circle);

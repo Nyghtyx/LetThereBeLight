@@ -89,6 +89,12 @@ public:
         return std::sqrtf((x-rhs.x)*(x-rhs.x) + (y-rhs.y)*(y-rhs.y));
     }
 
+    // avoid calculating square root for comparisons
+    float dist2(const Vec2& rhs) const
+    {
+        return (x - rhs.x) * (x - rhs.x) + (y - rhs.y) * (y - rhs.y);
+    }
+
     float length() const
     {
         return std::sqrtf((x * x) + (y * y));
