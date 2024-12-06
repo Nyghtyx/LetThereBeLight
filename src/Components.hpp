@@ -38,7 +38,7 @@ public:
     {
         polygon.setFillColor(sf::Color::Black);
         polygon.setOutlineColor(sf::Color::White);
-        polygon.setOutlineThickness(1);
+        polygon.setOutlineThickness(2);
     }
 };
 
