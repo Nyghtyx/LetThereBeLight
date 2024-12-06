@@ -19,9 +19,10 @@ class Scene_Light : public Scene
 	void onEnd();
 	void spawnLightSource();
 	void spawnPolygons();
+
 	void drawLinesToVertices(std::shared_ptr<Entity> polygon);
 	void drawPoint(const Vec2f& p, const sf::Color& color = { 255, 255, 255 });
-	void drawLineToIntersections(std::shared_ptr<Entity> lightSource, std::shared_ptr<Entity> polygon);
+	void racycastToPolygons(std::shared_ptr<Entity> lightSource, std::shared_ptr<Entity> polygon);
 	
 	void sDoAction(const Action& action);
 	void sCollision();
@@ -30,7 +31,9 @@ class Scene_Light : public Scene
 	void sRender();
 
 	std::shared_ptr<Entity> light();
-	Intersect lineIntersect(const Vec2f& a, const Vec2f& b, const Vec2f& c, const Vec2f& d);
+	Intersect lineIntersect(const Vec2f& a, const Vec2f& b, const Vec2f& c, const Vec2f& d); 
+	Intersect intersectPolygons(const Vec2f& a, const Vec2f& b);
+	Vec2f rotateLineSegment(const Vec2f& a, const Vec2f& b, float angle);
 
 public:
 
