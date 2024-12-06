@@ -235,7 +235,7 @@ Scene_Light::Intersect Scene_Light::intersectPolygons(const Vec2f& a, const Vec2
 			// now we have the 2 segments to check intersection (a-b) and (c-d)
 			Intersect intersect = lineIntersect(a, b, c, d);
 			// if it intersects and the intersection point is the closest then replace closest intersect
-			if (intersect.result && (a.dist(intersect.pos) < a.dist(closestIntersect.pos)))
+			if (intersect.result && (a.dist2(intersect.pos) < a.dist2(closestIntersect.pos)))
 			{
 				closestIntersect = intersect;
 			}
