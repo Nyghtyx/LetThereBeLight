@@ -36,8 +36,8 @@ public:
 
     void doAction(const Action & action);
     void registerAction(int inputKey, const std::string& actionName);
-    void drawLine(const Vec2f& p1, const Vec2f& p2);
-    
+    void drawLine(const Vec2f& p1, const Vec2f& p2, const sf::Color& color = { 255, 255, 255 });
+
     size_t width() const;
     size_t height() const;
     size_t currentFrame() const;

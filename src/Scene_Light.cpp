@@ -53,7 +53,7 @@ void Scene_Light::spawnLightSource()
 
 void Scene_Light::spawnPolygons()
 {
-	// Hardcoded polygons for example, clearly not scalable
+	// Hardcoded polygons, clearly not scalable
 	// probably read from file for true implementation into game
 	std::map<size_t, std::vector<Vec2f>> polyMap;
 	polyMap[0] = std::vector<Vec2f>{Vec2f(100.0f, 150.0f), Vec2f(120.0f, 50.0f), Vec2f(200.0f, 80.0f), Vec2f(140.0f, 210.0f) };
@@ -114,6 +114,7 @@ void Scene_Light::sMovement()
 	}
 	else
 	{
+		// capping the speed in all directions to 5
 		transform.velocity = velocity / velocity.length() * 5;
 	}
 
@@ -140,7 +141,30 @@ void Scene_Light::sCollision()
 
 void Scene_Light::sLighting()
 {
-	//TODO implement lighting calculations
+
+}
+
+void Scene_Light::drawLinesToVertices(std::shared_ptr<Entity> polygon)
+{
+	size_t vertices = polygon->get<CPolygon>().polygon.getPointCount();
+
+	for (int i = 0; i < vertices; i++)
+	{
+		const Vec2f& vertex = polygon->get<CPolygon>().polygon.getPoint(i);
+		drawPoint(vertex, sf::Color::Red);
+		drawLine(light()->get<CTransform>().pos, vertex, sf::Color::Red);
+	}
+}
+
+void Scene_Light::drawPoint(const Vec2f& p, const sf::Color& color)
+{
+	sf::CircleShape point(4, 8);
+	point.setFillColor(color);
+	point.setOutlineColor(sf::Color(color.r, color.g, color.b, 100));
+	point.setOutlineThickness(4);
+	point.setOrigin(4, 4);
+	point.setPosition(sf::Vector2f(p.x, p.y));
+	m_game.window().draw(point);
 }
 
 void Scene_Light::sRender()
@@ -150,6 +174,7 @@ void Scene_Light::sRender()
 	for (auto& polygon : m_entityManager.getEntities("polygon"))
 	{
 		m_game.window().draw(polygon->get<CPolygon>().polygon);
+		drawLinesToVertices(polygon);
 	}
 
 	// draw light source

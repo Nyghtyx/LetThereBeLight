@@ -39,8 +39,8 @@ size_t Scene::currentFrame() const
     return m_currentFrame;
 }
 
-void Scene::drawLine(const Vec2f& p1, const Vec2f& p2)
+void Scene::drawLine(const Vec2f& p1, const Vec2f& p2, const sf::Color& color)
 {
-    sf::Vertex line[] = { sf::Vector2f(p1.x, p1.y), sf::Vector2f(p2.x, p2.y) };
+    sf::Vertex line[] = { {sf::Vector2f(p1.x, p1.y), color}, {sf::Vector2f(p2.x, p2.y), color} };
     m_game.window().draw(line, 2, sf::Lines); 
 }

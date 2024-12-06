@@ -17,6 +17,8 @@ class Scene_Light : public Scene
 	void onEnd();
 	void spawnLightSource();
 	void spawnPolygons();
+	void drawLinesToVertices(std::shared_ptr<Entity> polygon);
+	void drawPoint(const Vec2f& p, const sf::Color& color = { 255, 255, 255 });
 	
 	void sDoAction(const Action& action);
 	void sCollision();
