@@ -34,6 +34,9 @@
     <ClInclude Include="src\Scene_Light.h" />
     <ClInclude Include="src\Vec2.hpp" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="shaders\light.frag" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>

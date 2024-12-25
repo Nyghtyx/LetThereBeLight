@@ -2,6 +2,7 @@
 
 #include "Scene.h"
 #include "EntityManager.hpp"
+#include <SFML/Graphics.hpp>
 #include <memory>
 #include <vector>
 
@@ -15,6 +16,7 @@ class Scene_Light : public Scene
 	};
 
 	bool m_drawRays = false;
+	sf::Shader m_lightShader;
 
 	void init();
 	void update();

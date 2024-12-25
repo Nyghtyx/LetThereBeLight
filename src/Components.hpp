@@ -37,8 +37,8 @@ public:
         : polygon(points)
     {
         polygon.setFillColor(sf::Color::Black);
-        polygon.setOutlineColor(sf::Color::White);
-        polygon.setOutlineThickness(2);
+        //polygon.setOutlineColor(sf::Color::White);
+        //polygon.setOutlineThickness(2);
     }
 };
 
