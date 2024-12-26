@@ -1,5 +1,5 @@
-#include "Scene_Light.h"
 #include "Scene_Raycast.h"
+#include "Scene_Light.h"
 #include "GameEngine.h"
 #include "Components.hpp"
 #include "Action.hpp"
@@ -10,13 +10,13 @@
 #include <map>
 #include <algorithm>
 
-Scene_Light::Scene_Light(GameEngine& gameEngine, Vec2f pos)
+Scene_Raycast::Scene_Raycast(GameEngine& gameEngine, Vec2f pos)
 	: Scene(gameEngine)
 {
 	init(pos);
 }
 
-void Scene_Light::init(Vec2f& pos)
+void Scene_Raycast::init(Vec2f& pos)
 {
 	registerAction(sf::Keyboard::Escape, "QUIT");
 	registerAction(sf::Keyboard::W, "UP");
@@ -25,21 +25,11 @@ void Scene_Light::init(Vec2f& pos)
 	registerAction(sf::Keyboard::D, "RIGHT");
 	registerAction(sf::Keyboard::C, "CHANGESCENE");
 
-	if (!sf::Shader::isAvailable())
-	{
-		std::cerr << "Shaders are not available" << std::endl;
-	}
-
-	if (!m_lightShader.loadFromFile("shaders/light.frag", sf::Shader::Fragment))
-	{
-		std::cerr << "Error while loading shaders" << std::endl;
-	}
-
 	spawnLightSource(pos);
 	spawnPolygons();
 }
 
-void Scene_Light::update()
+void Scene_Raycast::update()
 {
 	m_entityManager.update();
 
@@ -50,12 +40,12 @@ void Scene_Light::update()
 	m_currentFrame++;
 }
 
-void Scene_Light::onEnd()
+void Scene_Raycast::onEnd()
 {
 	m_game.quit();
 }
 
-void Scene_Light::spawnLightSource(Vec2f& pos)
+void Scene_Raycast::spawnLightSource(Vec2f& pos)
 {
 	auto light = m_entityManager.addEntity("light");
 	light->add<CTransform>(pos);
@@ -63,7 +53,7 @@ void Scene_Light::spawnLightSource(Vec2f& pos)
 	light->add<CInput>();
 }
 
-void Scene_Light::spawnPolygons()
+void Scene_Raycast::spawnPolygons()
 {
 	// Hardcoded polygons and bounds, clearly not scalable
 	// probably read from file for true implementation into game
@@ -88,12 +78,6 @@ void Scene_Light::spawnPolygons()
 		auto polygon = m_entityManager.addEntity("polygon");
 		polygon->add<CTransform>(points[0]);
 		polygon->add<CPolygon>(points.size());
-
-		// Set the room polygon alpha to 0
-		if (i == 0)
-		{
-			polygon->get<CPolygon>().polygon.setFillColor(sf::Color(0, 0, 0, 0));
-		}
 		
 		auto& shape = polygon->get<CPolygon>().polygon;
 		for (int j = 0; j < points.size(); j++)
@@ -103,7 +87,7 @@ void Scene_Light::spawnPolygons()
 	}
 }
 
-void Scene_Light::sDoAction(const Action& action)
+void Scene_Raycast::sDoAction(const Action& action)
 {
 	auto& input = light()->get<CInput>();
 
@@ -114,9 +98,9 @@ void Scene_Light::sDoAction(const Action& action)
 		else if (action.name() == "LEFT") { input.left = true; }
 		else if (action.name() == "RIGHT") { input.right = true; }
 		else if (action.name() == "QUIT") { onEnd(); }
-		else if (action.name() == "CHANGESCENE")
+		else if (action.name() == "CHANGESCENE") 
 		{
-			m_game.changeScene("RAYCAST", std::make_shared<Scene_Raycast>(m_game, light()->get<CTransform>().pos), true);
+			m_game.changeScene("LIGHT", std::make_shared<Scene_Light>(m_game, light()->get<CTransform>().pos), true);
 		}
 	}
 	else if (action.type() == "END")
@@ -128,7 +112,7 @@ void Scene_Light::sDoAction(const Action& action)
 	}
 }
 
-void Scene_Light::sMovement()
+void Scene_Raycast::sMovement()
 {
 	auto& transform = light()->get<CTransform>();
 	auto& input = light()->get<CInput>();
@@ -152,7 +136,7 @@ void Scene_Light::sMovement()
 	light()->get<CCircleShape>().circle.setPosition(transform.pos);
 }
 
-void Scene_Light::sCollision()
+void Scene_Raycast::sCollision()
 {
 	auto& transform = light()->get<CTransform>();
 	float radius = light()->get<CCircleShape>().circle.getRadius();
@@ -169,7 +153,7 @@ void Scene_Light::sCollision()
 	}
 }
 
-void Scene_Light::sLighting()
+void Scene_Raycast::sLighting()
 {
 	std::vector<Intersect> allIntersects;
 
@@ -179,47 +163,14 @@ void Scene_Light::sLighting()
 		allIntersects.insert(allIntersects.end(), intersects.begin(), intersects.end());
 	}
 
-	// sort the intersections by the angle that the segment between the light source and
-	// the intersection point makes with respect the x-axis
-	// we need to sort them because we have to create a sf::TrianglesFan and input the points
-	// in order
-	std::sort(allIntersects.begin(), allIntersects.end(), [](const Intersect& a, const Intersect& b)
-		{ return a.angle < b.angle; });
-	
-	std::vector<sf::Vertex> vertices;
-	//sf::Color visibilityColor = sf::Color(247, 247, 111, 60);
-	// to create a triangle fan in sfml
-	// first push the center point
-	vertices.push_back(sf::Vertex(light()->get<CTransform>().pos));
-	//vertices[0].color =  visibilityColor;
-	
-	// then push all the points
-	for (int i = 0; i < allIntersects.size(); i++)
+	for (size_t i = 0; i < allIntersects.size(); i++)
 	{
-		vertices.push_back(sf::Vertex(allIntersects[i].pos));
-		//vertices[i + 1].color = visibilityColor;
-	}
-	// then push the first point again to close the triangle fan
-	vertices.push_back(sf::Vertex(allIntersects.front().pos));
-	//vertices.back().color = visibilityColor;
-
-	// set shader parameters
-	// need to substract height() from y because sfml origin is topleft instead of botleft
-	m_lightShader.setUniform("lightPos", sf::Vector2f(light()->get<CTransform>().pos.x, height() - light()->get<CTransform>().pos.y));
-
-	m_game.window().draw(&vertices[0], vertices.size(), sf::TrianglesFan, &m_lightShader);
-
-	if (m_drawRays)
-	{
-		for (size_t i = 0; i < allIntersects.size(); i++)
-		{
-			drawLine(light()->get<CTransform>().pos, allIntersects[i].pos, sf::Color::Red);
-			drawPoint(allIntersects[i].pos, sf::Color::Red);
-		}
+		drawLine(light()->get<CTransform>().pos, allIntersects[i].pos, sf::Color::Red);
+		drawPoint(allIntersects[i].pos, sf::Color::Red);
 	}
 }
 
-std::vector<Scene_Light::Intersect> Scene_Light::racycastToPolygons(std::shared_ptr<Entity> lightSource, std::shared_ptr<Entity> polygon)
+std::vector<Scene_Raycast::Intersect> Scene_Raycast::racycastToPolygons(std::shared_ptr<Entity> lightSource, std::shared_ptr<Entity> polygon)
 {
 	Vec2f& a = lightSource->get<CTransform>().pos;
 
@@ -244,7 +195,7 @@ std::vector<Scene_Light::Intersect> Scene_Light::racycastToPolygons(std::shared_
 	return intersects;
 }
 
-Scene_Light::Intersect Scene_Light::intersectPolygons(const Vec2f& a, const Vec2f& b)
+Scene_Raycast::Intersect Scene_Raycast::intersectPolygons(const Vec2f& a, const Vec2f& b)
 {
 	// fake intersect initialized with a very far point so that it gets replaced
 	Intersect closestIntersect{ true, Vec2f(width() * 2 + 1, height() * 2 + 1), 0.0f };
@@ -270,7 +221,7 @@ Scene_Light::Intersect Scene_Light::intersectPolygons(const Vec2f& a, const Vec2
 	return closestIntersect;
 }
 
-Vec2f Scene_Light::rotateLineSegment(const Vec2f& a, const Vec2f& b, float angle)
+Vec2f Scene_Raycast::rotateLineSegment(const Vec2f& a, const Vec2f& b, float angle)
 {
 	Vec2f dv = b - a;
 	Vec2f rotatedVector = Vec2f(dv.x * cos(angle) - dv.y * sin(angle), dv.x * sin(angle) + dv.y * cos(angle));
@@ -282,7 +233,7 @@ Vec2f Scene_Light::rotateLineSegment(const Vec2f& a, const Vec2f& b, float angle
 	return a + rotatedVector * scale;
 }
 
-void Scene_Light::drawPoint(const Vec2f& p, const sf::Color& color)
+void Scene_Raycast::drawPoint(const Vec2f& p, const sf::Color& color)
 {
 	sf::CircleShape point(4, 8);
 	point.setFillColor(color);
@@ -293,30 +244,31 @@ void Scene_Light::drawPoint(const Vec2f& p, const sf::Color& color)
 	m_game.window().draw(point);
 }
 
-void Scene_Light::sRender()
+void Scene_Raycast::sRender()
 {
 	m_game.window().clear();
 
-	sLighting();
 
 	for (auto& polygon : m_entityManager.getEntities("polygon"))
 	{
 		m_game.window().draw(polygon->get<CPolygon>().polygon);
 	}
 
+	sLighting();
+
 	// draw light source
-	//m_game.window().draw(light()->get<CCircleShape>().circle);
+	m_game.window().draw(light()->get<CCircleShape>().circle);
 
 	m_game.window().display();
 }
 
-std::shared_ptr<Entity> Scene_Light::light()
+std::shared_ptr<Entity> Scene_Raycast::light()
 {
 	auto& lights = m_entityManager.getEntities("light");
 	return lights.front();
 }
 
-Scene_Light::Intersect Scene_Light::lineIntersect(const Vec2f& a, const Vec2f& b, const Vec2f& c, const Vec2f& d)
+Scene_Raycast::Intersect Scene_Raycast::lineIntersect(const Vec2f& a, const Vec2f& b, const Vec2f& c, const Vec2f& d)
 {
 	Vec2f r = b - a;
 	Vec2f s = d - c;

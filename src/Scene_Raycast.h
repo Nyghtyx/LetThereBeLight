@@ -6,7 +6,7 @@
 #include <memory>
 #include <vector>
 
-class Scene_Light : public Scene
+class Scene_Raycast : public Scene
 {
 	struct Intersect
 	{
@@ -14,9 +14,6 @@ class Scene_Light : public Scene
 		Vec2f pos;
 		float angle;
 	};
-
-	bool m_drawRays = false;
-	sf::Shader m_lightShader;
 
 	void init(Vec2f& pos);
 	void update();
@@ -40,5 +37,5 @@ class Scene_Light : public Scene
 
 public:
 
-	Scene_Light(GameEngine& gameEngine, Vec2f pos);
+	Scene_Raycast(GameEngine& gameEngine, Vec2f pos);
 };
