@@ -226,9 +226,9 @@ std::vector<Scene_Light::Intersect> Scene_Light::racycastToPolygons(std::shared_
 	size_t vertices = polygon->get<CPolygon>().polygon.getPointCount();
 	std::vector<Intersect> intersects;
 
-	// raycast to polygon vertices. For each vertex 3 rays should be cast.
-	// one to the vertex, one slightly to the left and one slightly to the right
-	// these left and right extra right make sure lighting reaches the bounds of the window
+	// raycast to polygon vertices. For each vertex cast 2 rays.
+	// one slightly to the left and one slightly to the right of the vertex
+	// these left and right make sure lighting reaches the bounds of the window
 	// should check the closest interesect with a polygon segment and return it
 	for (int i = 0; i < vertices; i++)
 	{
@@ -238,7 +238,6 @@ std::vector<Scene_Light::Intersect> Scene_Light::racycastToPolygons(std::shared_
 		Intersect rightIntersect = intersectPolygons(a, rotateLineSegment(a, vertex, -0.0001f));
 
 		intersects.push_back(leftIntersect);
-		intersects.push_back(vertexIntersect);
 		intersects.push_back(rightIntersect);
 	}
 	return intersects;
