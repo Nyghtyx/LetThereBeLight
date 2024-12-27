@@ -33,6 +33,7 @@ public:
     void                    run();
 
     sf::RenderWindow &      window();
+    sf::Clock&              clock();
     size_t                  width() const;
     size_t                  height() const;
     bool                    isRunning() const;

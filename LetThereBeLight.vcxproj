@@ -24,6 +24,7 @@
     <ClCompile Include="src\Scene.cpp" />
     <ClCompile Include="src\Scene_Light.cpp" />
     <ClCompile Include="src\Scene_Raycast.cpp" />
+    <ClCompile Include="src\Scene_Shadows.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Action.hpp" />
@@ -34,9 +35,11 @@
     <ClInclude Include="src\Scene.h" />
     <ClInclude Include="src\Scene_Light.h" />
     <ClInclude Include="src\Scene_Raycast.h" />
+    <ClInclude Include="src\Scene_Shadows.h" />
     <ClInclude Include="src\Vec2.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="shaders\blur.frag" />
     <None Include="shaders\light.frag" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

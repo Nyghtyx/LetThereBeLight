@@ -1,6 +1,7 @@
 #include "Scene.h"
 #include "Scene_Light.h"
 #include "Scene_Raycast.h"
+#include "Scene_Shadows.h"
 #include "GameEngine.h"
 
 #include <iostream>
@@ -15,7 +16,7 @@ void GameEngine::init()
     m_window.create(sf::VideoMode(1280, 720), "Let There Be Light");
     m_window.setFramerateLimit(60);
 
-    changeScene("RAYCAST", std::make_shared<Scene_Raycast>(*this, Vec2f(width() / 2.0f, height() / 2.0f)));
+    changeScene("SHADOWS", std::make_shared<Scene_Shadows>(*this, Vec2f(width() / 2.0f, height() / 2.0f)));
 }
 
 std::shared_ptr<Scene> GameEngine::currentScene()
@@ -31,6 +32,11 @@ bool GameEngine::isRunning() const
 sf::RenderWindow & GameEngine::window()
 {
     return m_window;
+}
+
+sf::Clock& GameEngine::clock()
+{
+    return m_deltaClock;
 }
 
 size_t GameEngine::width() const

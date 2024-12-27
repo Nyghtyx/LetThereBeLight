@@ -30,6 +30,9 @@
     <ClCompile Include="src\Scene_Raycast.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\Scene_Shadows.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Action.hpp">
@@ -59,9 +62,15 @@
     <ClInclude Include="src\Scene_Raycast.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\Scene_Shadows.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\light.frag">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="shaders\blur.frag">
       <Filter>Resource Files</Filter>
     </None>
   </ItemGroup>
