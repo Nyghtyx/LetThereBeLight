@@ -16,6 +16,7 @@ class Scene_Light : public Scene
 	};
 
 	bool m_drawRays = false;
+	bool m_shader = false;
 	sf::Shader m_lightShader;
 
 	void init(Vec2f& pos);

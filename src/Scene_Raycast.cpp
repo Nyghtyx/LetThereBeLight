@@ -24,6 +24,7 @@ void Scene_Raycast::init(Vec2f& pos)
 	registerAction(sf::Keyboard::S, "DOWN");
 	registerAction(sf::Keyboard::D, "RIGHT");
 	registerAction(sf::Keyboard::C, "CHANGESCENE");
+	registerAction(sf::Keyboard::E, "RAYCAST");
 
 	spawnLightSource(pos);
 	spawnPolygons();
@@ -97,6 +98,7 @@ void Scene_Raycast::sDoAction(const Action& action)
 		else if (action.name() == "DOWN") { input.down = true; }
 		else if (action.name() == "LEFT") { input.left = true; }
 		else if (action.name() == "RIGHT") { input.right = true; }
+		else if (action.name() == "RAYCAST") { m_raycast = !m_raycast; }
 		else if (action.name() == "QUIT") { onEnd(); }
 		else if (action.name() == "CHANGESCENE") 
 		{
@@ -163,10 +165,13 @@ void Scene_Raycast::sLighting()
 		allIntersects.insert(allIntersects.end(), intersects.begin(), intersects.end());
 	}
 
-	for (size_t i = 0; i < allIntersects.size(); i++)
+	if (m_raycast)
 	{
-		drawLine(light()->get<CTransform>().pos, allIntersects[i].pos, sf::Color::Red);
-		drawPoint(allIntersects[i].pos, sf::Color::Red);
+		for (size_t i = 0; i < allIntersects.size(); i++)
+		{
+			drawLine(light()->get<CTransform>().pos, allIntersects[i].pos, sf::Color::Red);
+			drawPoint(allIntersects[i].pos, sf::Color::Red);
+		}
 	}
 }
 

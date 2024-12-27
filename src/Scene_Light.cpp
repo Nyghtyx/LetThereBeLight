@@ -24,6 +24,7 @@ void Scene_Light::init(Vec2f& pos)
 	registerAction(sf::Keyboard::S, "DOWN");
 	registerAction(sf::Keyboard::D, "RIGHT");
 	registerAction(sf::Keyboard::C, "CHANGESCENE");
+	registerAction(sf::Keyboard::E, "SHADER");
 
 	if (!sf::Shader::isAvailable())
 	{
@@ -114,6 +115,7 @@ void Scene_Light::sDoAction(const Action& action)
 		else if (action.name() == "LEFT") { input.left = true; }
 		else if (action.name() == "RIGHT") { input.right = true; }
 		else if (action.name() == "QUIT") { onEnd(); }
+		else if (action.name() == "SHADER") { m_shader = !m_shader; }
 		else if (action.name() == "CHANGESCENE")
 		{
 			m_game.changeScene("SHADOWS", std::make_shared<Scene_Shadows>(m_game, light()->get<CTransform>().pos), true);
@@ -186,28 +188,35 @@ void Scene_Light::sLighting()
 	std::sort(allIntersects.begin(), allIntersects.end(), [](const Intersect& a, const Intersect& b)
 		{ return a.angle < b.angle; });
 	
+	sf::Color visibilityColor = sf::Color(247, 247, 111, 60);
 	std::vector<sf::Vertex> vertices;
-	//sf::Color visibilityColor = sf::Color(247, 247, 111, 60);
 	// to create a triangle fan in sfml
 	// first push the center point
 	vertices.push_back(sf::Vertex(light()->get<CTransform>().pos));
-	//vertices[0].color =  visibilityColor;
-	
+	vertices[0].color = visibilityColor;
+
 	// then push all the points
 	for (int i = 0; i < allIntersects.size(); i++)
 	{
 		vertices.push_back(sf::Vertex(allIntersects[i].pos));
-		//vertices[i + 1].color = visibilityColor;
+		vertices[i + 1].color = visibilityColor;
 	}
 	// then push the first point again to close the triangle fan
 	vertices.push_back(sf::Vertex(allIntersects.front().pos));
-	//vertices.back().color = visibilityColor;
+	vertices.back().color = visibilityColor;
 
 	// set shader parameters
 	// need to substract height() from y because sfml origin is topleft instead of botleft
 	m_lightShader.setUniform("lightPos", sf::Vector2f(light()->get<CTransform>().pos.x, height() - light()->get<CTransform>().pos.y));
 
-	m_game.window().draw(&vertices[0], vertices.size(), sf::TrianglesFan, &m_lightShader);
+	if (m_shader)
+	{
+		m_game.window().draw(&vertices[0], vertices.size(), sf::TrianglesFan, &m_lightShader);
+	}
+	else
+	{
+		m_game.window().draw(&vertices[0], vertices.size(), sf::TrianglesFan);
+	}
 
 	if (m_drawRays)
 	{
@@ -304,7 +313,10 @@ void Scene_Light::sRender()
 	}
 
 	// draw light source
-	//m_game.window().draw(light()->get<CCircleShape>().circle);
+	if (!m_shader)
+	{
+		m_game.window().draw(light()->get<CCircleShape>().circle);
+	}
 
 	m_game.window().display();
 }

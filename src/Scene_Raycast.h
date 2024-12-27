@@ -15,6 +15,8 @@ class Scene_Raycast : public Scene
 		float angle;
 	};
 
+	bool m_raycast = false;
+
 	void init(Vec2f& pos);
 	void update();
 	void onEnd();
