@@ -14,3 +14,8 @@ In essence, we perform ray casting from the lightsource to each segment vertex a
 The light effect is achieved by using each intersection point to draw a TrianglesFan using SFML library.
 
 ![til](./gifs/light.gif)
+
+Here is a gif showing some of the stages from raycasting to the visibility polygon (trianglefan) to adding some shaders
+for lighting and soft shadows.
+
+![til](./gifs/lightwithshader.gif)
