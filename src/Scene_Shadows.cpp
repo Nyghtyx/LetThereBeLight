@@ -35,9 +35,9 @@ void Scene_Shadows::init(Vec2f& pos)
 		std::cerr << "Error while loading light shader" << std::endl;
 	}
 
-	if (!m_blurShader.loadFromFile("shaders/blur.frag", sf::Shader::Fragment))
+	if (!m_penumbraShader.loadFromFile("shaders/blur.frag", sf::Shader::Fragment))
 	{
-		std::cerr << "Error while loading blur shader" << std::endl;
+		std::cerr << "Error while loading penumbra shader" << std::endl;
 	}
 
 	spawnLightSource(pos);
@@ -192,21 +192,17 @@ void Scene_Shadows::sLighting()
 		{ return a.angle < b.angle; });
 	
 	std::vector<sf::Vertex> vertices;
-	//sf::Color visibilityColor = sf::Color(247, 247, 111, 60);
 	// to create a triangle fan in sfml
 	// first push the center point
 	vertices.push_back(sf::Vertex(light()->get<CTransform>().pos));
-	//vertices[0].color =  visibilityColor;
 	
 	// then push all the points
 	for (int i = 0; i < allIntersects.size(); i++)
 	{
 		vertices.push_back(sf::Vertex(allIntersects[i].pos));
-		//vertices[i + 1].color = visibilityColor;
 	}
 	// then push the first point again to close the triangle fan
 	vertices.push_back(sf::Vertex(allIntersects.front().pos));
-	//vertices.back().color = visibilityColor;
 
 	// set shader parameters
 	// need to substract height() from y because sfml origin is topleft instead of botleft
@@ -217,11 +213,13 @@ void Scene_Shadows::sLighting()
 	lightMap.draw(&vertices[0], vertices.size(), sf::TrianglesFan, &m_lightShader);
 	lightMap.display();
 
-	m_blurShader.setUniform("texture", lightMap.getTexture());
-	m_blurShader.setUniform("resolution", sf::Vector2f(m_game.window().getSize()));
+	m_penumbraShader.setUniform("lightMap", lightMap.getTexture());
+	m_penumbraShader.setUniform("resolution", sf::Vector2f(m_game.window().getSize()));
+	m_penumbraShader.setUniform("baseBlurRadius", 50);
+	m_penumbraShader.setUniform("lightPos", sf::Vector2f(light()->get<CTransform>().pos.x, height() - light()->get<CTransform>().pos.y));
 
 	sf::Sprite sprite(lightMap.getTexture());
-	m_game.window().draw(sprite, &m_blurShader);
+	m_game.window().draw(sprite, &m_penumbraShader);
 
 	if (m_drawRays)
 	{

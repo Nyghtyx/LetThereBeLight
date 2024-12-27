@@ -1,5 +1,5 @@
 #include "Scene_Light.h"
-#include "Scene_Raycast.h"
+#include "Scene_Shadows.h"
 #include "GameEngine.h"
 #include "Components.hpp"
 #include "Action.hpp"
@@ -116,7 +116,7 @@ void Scene_Light::sDoAction(const Action& action)
 		else if (action.name() == "QUIT") { onEnd(); }
 		else if (action.name() == "CHANGESCENE")
 		{
-			m_game.changeScene("RAYCAST", std::make_shared<Scene_Raycast>(m_game, light()->get<CTransform>().pos), true);
+			m_game.changeScene("SHADOWS", std::make_shared<Scene_Shadows>(m_game, light()->get<CTransform>().pos), true);
 		}
 	}
 	else if (action.type() == "END")

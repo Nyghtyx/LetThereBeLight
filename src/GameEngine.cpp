@@ -16,7 +16,7 @@ void GameEngine::init()
     m_window.create(sf::VideoMode(1280, 720), "Let There Be Light");
     m_window.setFramerateLimit(60);
 
-    changeScene("SHADOWS", std::make_shared<Scene_Shadows>(*this, Vec2f(width() / 2.0f, height() / 2.0f)));
+    changeScene("RAYCAST", std::make_shared<Scene_Raycast>(*this, Vec2f(width() / 2.0f, height() / 2.0f)));
 }
 
 std::shared_ptr<Scene> GameEngine::currentScene()

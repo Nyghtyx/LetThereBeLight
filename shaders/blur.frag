@@ -1,27 +1,56 @@
 #version 130
 
-uniform sampler2D texture;
+uniform sampler2D lightMap;
 uniform vec2 resolution;
+uniform int baseBlurRadius;
+uniform vec2 lightPos;
 
 void main()
 {
 	vec2 uv = gl_FragCoord.xy / resolution;
+	vec2 normPos = lightPos.xy / resolution;
+	float distanceToLight = length(uv - normPos);
+	float blurRadius = baseBlurRadius * distanceToLight;
 	vec4 color = vec4(0.0);
+	int samples = 0;
 
-	float kernel[5] = float[](0.05, 0.1, 0.4, 0.1, 0.05);
+	if (texture2D(lightMap, uv).r == 0.0)
+	{		
+		// Horizontal blur
+		for (int i = -2; i <= 2; i++)
+		{
+			vec4 pixel = texture2D(lightMap, uv + vec2(i * blurRadius, 0) / resolution);
+			if (pixel.r == 0.0)
+			{
+				color += vec4(pixel.rgb / 2.0, pixel.a);
+			}
+			else
+			{
+				color += pixel;
+			}
+			samples++;
+		}
 
-	// Horizontal blur
-	for (int i = -2; i <= 2; i++)
-	{
-		color += texture2D(texture, uv + vec2(i * 10, 0) / resolution) * kernel[i + 2];
+		// Vertical blur
+		vec4 verticalBlur = vec4(0.0);
+		for (int i = -2; i <= 2; i++)
+		{
+			vec4 pixel = texture2D(lightMap, uv + vec2(0, i * blurRadius) / resolution);
+			if (pixel.r == 0.0)
+			{
+				color += vec4(pixel.rgb / 2.0, pixel.a);
+			}
+			else
+			{
+				color += pixel;
+			}
+			samples++;
+		}
+
+		gl_FragColor = color / samples;
 	}
-
-	// Vertical blur
-	vec4 verticalBlur = vec4(0.0);
-	for (int i = -2; i <= 2; i++)
+	else
 	{
-		verticalBlur += texture2D(texture, uv + vec2(0, i * 10) / resolution) * kernel[i + 2];
+		gl_FragColor = texture2D(lightMap, uv);
 	}
-
-	gl_FragColor = (color + verticalBlur) / 2.0;
 }

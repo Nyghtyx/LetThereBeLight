@@ -17,7 +17,7 @@ class Scene_Shadows : public Scene
 
 	bool m_drawRays = false;
 	sf::Shader m_lightShader;
-	sf::Shader m_blurShader;
+	sf::Shader m_penumbraShader;
 
 	void init(Vec2f& pos);
 	void update();
