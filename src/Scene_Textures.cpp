@@ -1,5 +1,5 @@
-#include "Scene_Shadows.h"
 #include "Scene_Textures.h"
+#include "Scene_Raycast.h"
 #include "GameEngine.h"
 #include "Components.hpp"
 #include "Action.hpp"
@@ -10,13 +10,13 @@
 #include <map>
 #include <algorithm>
 
-Scene_Shadows::Scene_Shadows(GameEngine& gameEngine, Vec2f pos)
+Scene_Textures::Scene_Textures(GameEngine& gameEngine, Vec2f pos)
 	: Scene(gameEngine)
 {
 	init(pos);
 }
 
-void Scene_Shadows::init(Vec2f& pos)
+void Scene_Textures::init(Vec2f& pos)
 {
 	registerAction(sf::Keyboard::Escape, "QUIT");
 	registerAction(sf::Keyboard::W, "UP");
@@ -40,11 +40,16 @@ void Scene_Shadows::init(Vec2f& pos)
 		std::cerr << "Error while loading penumbra shader" << std::endl;
 	}
 
+	if (!m_floor.loadFromFile("images/dungeon_example.png"))
+	{
+		std::cerr << "Error while loading floor texture" << std::endl;
+	}
+
 	spawnLightSource(pos);
 	spawnPolygons();
 }
 
-void Scene_Shadows::update()
+void Scene_Textures::update()
 {
 	m_entityManager.update();
 
@@ -55,12 +60,12 @@ void Scene_Shadows::update()
 	m_currentFrame++;
 }
 
-void Scene_Shadows::onEnd()
+void Scene_Textures::onEnd()
 {
 	m_game.quit();
 }
 
-void Scene_Shadows::spawnLightSource(Vec2f& pos)
+void Scene_Textures::spawnLightSource(Vec2f& pos)
 {
 	auto light = m_entityManager.addEntity("light");
 	light->add<CTransform>(pos);
@@ -68,25 +73,25 @@ void Scene_Shadows::spawnLightSource(Vec2f& pos)
 	light->add<CInput>();
 }
 
-void Scene_Shadows::spawnPolygons()
+void Scene_Textures::spawnPolygons()
 {
 	// Hardcoded polygons and bounds, clearly not scalable
 	// probably read from file for true implementation into game
 	std::map<size_t, std::vector<Vec2f>> polyMap;
 	polyMap[0] = std::vector<Vec2f>{ Vec2f(0.0f, 0.0f), Vec2f(0.0f, height()), Vec2f(width(), height()), Vec2f(width(), 0.0f) };
-	polyMap[1] = std::vector<Vec2f>{ Vec2f(100.0f, 150.0f), Vec2f(120.0f, 50.0f), Vec2f(200.0f, 80.0f), Vec2f(140.0f, 210.0f) };
-	polyMap[2] = std::vector<Vec2f>{ Vec2f(100.0f, 200.0f), Vec2f(120.0f, 250.0f), Vec2f(60.0f, 300.0f) };
-	polyMap[3] = std::vector<Vec2f>{ Vec2f(200.0f, 260.0f), Vec2f(220.0f, 150.0f), Vec2f(300.0f, 200.0f), Vec2f(350.0f, 320.0f) };
-	polyMap[4] = std::vector<Vec2f>{ Vec2f(540.0f, 60.0f), Vec2f(560.0f, 40.0f), Vec2f(570.0f, 70.0f) };
-	polyMap[5] = std::vector<Vec2f>{ Vec2f(650.0f, 190.0f), Vec2f(760.0f, 170.0f), Vec2f(740.0f, 270.0f), Vec2f(630.0f, 290.0f) };
-	polyMap[6] = std::vector<Vec2f>{ Vec2f(600.0f, 95.0f), Vec2f(780.0f, 50.0f), Vec2f(680.0f, 150.0f)};
-	polyMap[7] = std::vector<Vec2f>{ Vec2f(100.0f, 600.0f), Vec2f(150.0f, 520.0f), Vec2f(200.0f, 620.0f), Vec2f(130.0f, 700.0f) };
-	polyMap[8] = std::vector<Vec2f>{ Vec2f(300.0f, 500.0f), Vec2f(400.0f, 450.0f), Vec2f(350.0f, 550.0f) };
-	polyMap[9] = std::vector<Vec2f>{ Vec2f(600.0f, 500.0f), Vec2f(700.0f, 470.0f), Vec2f(750.0f, 580.0f), Vec2f(650.0f, 620.0f) };
-	polyMap[10] = std::vector<Vec2f>{ Vec2f(900.0f, 300.0f), Vec2f(950.0f, 250.0f), Vec2f(1000.0f, 350.0f), Vec2f(920.0f, 400.0f) };
-	polyMap[11] = std::vector<Vec2f>{ Vec2f(1050.0f, 600.0f), Vec2f(1150.0f, 480.0f), Vec2f(1180.0f, 670.0f), Vec2f(1000.0f, 700.0f) };
-	polyMap[12] = std::vector<Vec2f>{ Vec2f(400.0f, 300.0f), Vec2f(450.0f, 280.0f), Vec2f(500.0f, 320.0f), Vec2f(430.0f, 350.0f) };
-	polyMap[13] = std::vector<Vec2f>{ Vec2f(1050.0f, 40.0f), Vec2f(1200.0f, 180.0f), Vec2f(950.0f, 200.0f), Vec2f(850.0f, 160.0f) };
+	//polyMap[1] = std::vector<Vec2f>{ Vec2f(100.0f, 150.0f), Vec2f(120.0f, 50.0f), Vec2f(200.0f, 80.0f), Vec2f(140.0f, 210.0f) };
+	//polyMap[2] = std::vector<Vec2f>{ Vec2f(100.0f, 200.0f), Vec2f(120.0f, 250.0f), Vec2f(60.0f, 300.0f) };
+	//polyMap[3] = std::vector<Vec2f>{ Vec2f(200.0f, 260.0f), Vec2f(220.0f, 150.0f), Vec2f(300.0f, 200.0f), Vec2f(350.0f, 320.0f) };
+	//polyMap[4] = std::vector<Vec2f>{ Vec2f(540.0f, 60.0f), Vec2f(560.0f, 40.0f), Vec2f(570.0f, 70.0f) };
+	//polyMap[5] = std::vector<Vec2f>{ Vec2f(650.0f, 190.0f), Vec2f(760.0f, 170.0f), Vec2f(740.0f, 270.0f), Vec2f(630.0f, 290.0f) };
+	//polyMap[6] = std::vector<Vec2f>{ Vec2f(600.0f, 95.0f), Vec2f(780.0f, 50.0f), Vec2f(680.0f, 150.0f)};
+	//polyMap[7] = std::vector<Vec2f>{ Vec2f(100.0f, 600.0f), Vec2f(150.0f, 520.0f), Vec2f(200.0f, 620.0f), Vec2f(130.0f, 700.0f) };
+	//polyMap[8] = std::vector<Vec2f>{ Vec2f(300.0f, 500.0f), Vec2f(400.0f, 450.0f), Vec2f(350.0f, 550.0f) };
+	//polyMap[9] = std::vector<Vec2f>{ Vec2f(600.0f, 500.0f), Vec2f(700.0f, 470.0f), Vec2f(750.0f, 580.0f), Vec2f(650.0f, 620.0f) };
+	//polyMap[10] = std::vector<Vec2f>{ Vec2f(900.0f, 300.0f), Vec2f(950.0f, 250.0f), Vec2f(1000.0f, 350.0f), Vec2f(920.0f, 400.0f) };
+	//polyMap[11] = std::vector<Vec2f>{ Vec2f(1050.0f, 600.0f), Vec2f(1150.0f, 480.0f), Vec2f(1180.0f, 670.0f), Vec2f(1000.0f, 700.0f) };
+	//polyMap[12] = std::vector<Vec2f>{ Vec2f(400.0f, 300.0f), Vec2f(450.0f, 280.0f), Vec2f(500.0f, 320.0f), Vec2f(430.0f, 350.0f) };
+	//polyMap[13] = std::vector<Vec2f>{ Vec2f(1050.0f, 40.0f), Vec2f(1200.0f, 180.0f), Vec2f(950.0f, 200.0f), Vec2f(850.0f, 160.0f) };
 
 	for (auto& [i, points] : polyMap)
 	{
@@ -108,7 +113,7 @@ void Scene_Shadows::spawnPolygons()
 	}
 }
 
-void Scene_Shadows::sDoAction(const Action& action)
+void Scene_Textures::sDoAction(const Action& action)
 {
 	auto& input = light()->get<CInput>();
 
@@ -121,7 +126,7 @@ void Scene_Shadows::sDoAction(const Action& action)
 		else if (action.name() == "QUIT") { onEnd(); }
 		else if (action.name() == "CHANGESCENE")
 		{
-			m_game.changeScene("TEXTURES", std::make_shared<Scene_Textures>(m_game, light()->get<CTransform>().pos), true);
+			m_game.changeScene("RAYCAST", std::make_shared<Scene_Raycast>(m_game, light()->get<CTransform>().pos), true);
 		}
 	}
 	else if (action.type() == "END")
@@ -133,7 +138,7 @@ void Scene_Shadows::sDoAction(const Action& action)
 	}
 }
 
-void Scene_Shadows::sMovement()
+void Scene_Textures::sMovement()
 {
 	auto& transform = light()->get<CTransform>();
 	auto& input = light()->get<CInput>();
@@ -157,7 +162,7 @@ void Scene_Shadows::sMovement()
 	light()->get<CCircleShape>().circle.setPosition(transform.pos);
 }
 
-void Scene_Shadows::sCollision()
+void Scene_Textures::sCollision()
 {
 	auto& transform = light()->get<CTransform>();
 	float radius = light()->get<CCircleShape>().circle.getRadius();
@@ -174,7 +179,7 @@ void Scene_Shadows::sCollision()
 	}
 }
 
-void Scene_Shadows::sLighting()
+void Scene_Textures::sLighting()
 {
 	std::vector<Intersect> allIntersects;
 
@@ -215,11 +220,15 @@ void Scene_Shadows::sLighting()
 
 	m_penumbraShader.setUniform("lightMap", lightMap.getTexture());
 	m_penumbraShader.setUniform("resolution", sf::Vector2f(m_game.window().getSize()));
-	m_penumbraShader.setUniform("baseBlurRadius", 50);
+	m_penumbraShader.setUniform("baseBlurRadius", 100);
 	m_penumbraShader.setUniform("lightPos", sf::Vector2f(light()->get<CTransform>().pos.x, height() - light()->get<CTransform>().pos.y));
 
 	sf::Sprite sprite(lightMap.getTexture());
-	m_game.window().draw(sprite, &m_penumbraShader);
+	sf::RenderStates renderStates;
+	renderStates.blendMode = sf::BlendMultiply;
+	renderStates.shader = &m_penumbraShader;
+
+	m_game.window().draw(sprite, renderStates);
 
 	if (m_drawRays)
 	{
@@ -231,7 +240,7 @@ void Scene_Shadows::sLighting()
 	}
 }
 
-std::vector<Scene_Shadows::Intersect> Scene_Shadows::racycastToPolygons(std::shared_ptr<Entity> lightSource, std::shared_ptr<Entity> polygon)
+std::vector<Scene_Textures::Intersect> Scene_Textures::racycastToPolygons(std::shared_ptr<Entity> lightSource, std::shared_ptr<Entity> polygon)
 {
 	Vec2f& a = lightSource->get<CTransform>().pos;
 
@@ -255,7 +264,7 @@ std::vector<Scene_Shadows::Intersect> Scene_Shadows::racycastToPolygons(std::sha
 	return intersects;
 }
 
-Scene_Shadows::Intersect Scene_Shadows::intersectPolygons(const Vec2f& a, const Vec2f& b)
+Scene_Textures::Intersect Scene_Textures::intersectPolygons(const Vec2f& a, const Vec2f& b)
 {
 	// fake intersect initialized with a very far point so that it gets replaced
 	Intersect closestIntersect{ true, Vec2f(width() * 2 + 1, height() * 2 + 1), 0.0f };
@@ -281,7 +290,7 @@ Scene_Shadows::Intersect Scene_Shadows::intersectPolygons(const Vec2f& a, const 
 	return closestIntersect;
 }
 
-Vec2f Scene_Shadows::rotateLineSegment(const Vec2f& a, const Vec2f& b, float angle)
+Vec2f Scene_Textures::rotateLineSegment(const Vec2f& a, const Vec2f& b, float angle)
 {
 	Vec2f dv = b - a;
 	Vec2f rotatedVector = Vec2f(dv.x * cos(angle) - dv.y * sin(angle), dv.x * sin(angle) + dv.y * cos(angle));
@@ -293,7 +302,7 @@ Vec2f Scene_Shadows::rotateLineSegment(const Vec2f& a, const Vec2f& b, float ang
 	return a + rotatedVector * scale;
 }
 
-void Scene_Shadows::drawPoint(const Vec2f& p, const sf::Color& color)
+void Scene_Textures::drawPoint(const Vec2f& p, const sf::Color& color)
 {
 	sf::CircleShape point(4, 8);
 	point.setFillColor(color);
@@ -304,10 +313,11 @@ void Scene_Shadows::drawPoint(const Vec2f& p, const sf::Color& color)
 	m_game.window().draw(point);
 }
 
-void Scene_Shadows::sRender()
+void Scene_Textures::sRender()
 {
 	m_game.window().clear();
 
+	m_game.window().draw(sf::Sprite(m_floor));
 	sLighting();
 
 	for (auto& polygon : m_entityManager.getEntities("polygon"))
@@ -316,18 +326,18 @@ void Scene_Shadows::sRender()
 	}
 
 	// draw light source
-	//m_game.window().draw(light()->get<CCircleShape>().circle);
+	m_game.window().draw(light()->get<CCircleShape>().circle);
 
 	m_game.window().display();
 }
 
-std::shared_ptr<Entity> Scene_Shadows::light()
+std::shared_ptr<Entity> Scene_Textures::light()
 {
 	auto& lights = m_entityManager.getEntities("light");
 	return lights.front();
 }
 
-Scene_Shadows::Intersect Scene_Shadows::lineIntersect(const Vec2f& a, const Vec2f& b, const Vec2f& c, const Vec2f& d)
+Scene_Textures::Intersect Scene_Textures::lineIntersect(const Vec2f& a, const Vec2f& b, const Vec2f& c, const Vec2f& d)
 {
 	Vec2f r = b - a;
 	Vec2f s = d - c;

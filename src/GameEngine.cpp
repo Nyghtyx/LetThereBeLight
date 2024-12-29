@@ -2,6 +2,7 @@
 #include "Scene_Light.h"
 #include "Scene_Raycast.h"
 #include "Scene_Shadows.h"
+#include "Scene_Textures.h"
 #include "GameEngine.h"
 
 #include <iostream>
@@ -16,7 +17,7 @@ void GameEngine::init()
     m_window.create(sf::VideoMode(1280, 720), "Let There Be Light");
     m_window.setFramerateLimit(60);
 
-    changeScene("RAYCAST", std::make_shared<Scene_Raycast>(*this, Vec2f(width() / 2.0f, height() / 2.0f)));
+    changeScene("TEXTURES", std::make_shared<Scene_Textures>(*this, Vec2f(width() / 2.0f, height() / 2.0f)));
 }
 
 std::shared_ptr<Scene> GameEngine::currentScene()
